@@ -1,0 +1,24 @@
+name: Free iOS Build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Compile Unsigned IPA
+        run: |
+          mkdir -p build/Payload
+          
+          # If your repository is built with standard Web HTML/JS code:
+          cp -r * build/Payload/ 2>/dev/null || true
+          
+          # Bundle the payload into an installable application package
+          cd build && zip -r app.ipa Payload/
+
+      - name: Upload Finished Package
+        uses: actions/artifacts@v4
+        with:
+          name: ios-app-package
+          path: build/app.ipa

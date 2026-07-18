@@ -1,24 +1,22 @@
-name: Free iOS Build
+name: Compile Direct iOS Package
 on: [push, workflow_dispatch]
+
 jobs:
-  build:
-    runs-on: macos-latest
+  pack-app:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Fetch Repository Files
         uses: actions/checkout@v4
 
-      - name: Compile Unsigned IPA
+      - name: Build Application Directory Structure
         run: |
-          mkdir -p build/Payload
-          
-          # If your repository is built with standard Web HTML/JS code:
-          cp -r * build/Payload/ 2>/dev/null || true
-          
-          # Bundle the payload into an installable application package
-          cd build && zip -r app.ipa Payload/
+          mkdir -p Payload/Application.app
+          # Copy your current files into the executable payload folder
+          cp -r * Payload/Application.app/ 2>/dev/null || true
+          zip -r standalone_app.ipa Payload/
 
-      - name: Upload Finished Package
-        uses: actions/artifacts@v4
+      - name: Export Application Package
+        uses: actions/upload-artifact@v4
         with:
-          name: ios-app-package
-          path: build/app.ipa
+          name: DownloadableIPAPackage
+          path: standalone_app.ipa
